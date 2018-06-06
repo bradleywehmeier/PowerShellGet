@@ -7,24 +7,24 @@ function Set-MergedModuleSourcesVariable
     )
 
     if(-not $script:PSGetMergedModuleSources -or $Force) {
-        $script:PSGetMergedModuleSources = [ordered]@{}
+        $merged = [ordered]@{}
 
         if($script:PSGetModuleSources) {
             $script:PSGetModuleSources.Keys | Microsoft.PowerShell.Core\ForEach-Object {
-                if(-not $script:PSGetMergedModuleSources.Contains($_)) {
-                    $script:PSGetMergedModuleSources.Add($_, $script:PSGetModuleSources[$_])
+                if(-not $merged.Contains($_)) {
+                    $merged.Add($_, $script:PSGetModuleSources[$_])
                 }
             }
         }
 
         if($script:PSGetAllUsersModuleSources) {
             $script:PSGetAllUsersModuleSources.Keys | Microsoft.PowerShell.Core\ForEach-Object {
-                if(-not $script:PSGetMergedModuleSources.Contains($_)) {
-                    $script:PSGetMergedModuleSources.Add($_, $script:PSGetAllUsersModuleSources[$_])
+                if(-not $merged.Contains($_)) {
+                    $merged.Add($_, $script:PSGetAllUsersModuleSources[$_])
                 }
             }
         }
 
-        Write-Debug -Message "Merged Module Sources: $($script:PSGetMergedModuleSources.Keys)"
+        $script:PSGetMergedModuleSources = $merged.AsReadOnly()
     }
 }
