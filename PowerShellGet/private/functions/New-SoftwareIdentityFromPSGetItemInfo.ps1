@@ -96,7 +96,8 @@ function New-SoftwareIdentityFromPSGetItemInfo
                 Links = $links
                }
 
-    if($sourceName -and $script:PSGetModuleSources[$sourceName].Trusted)
+    $moduleSources = Get-ModuleSourcesCollection
+    if($sourceName -and $moduleSources[$sourceName].Trusted)
     {
         $params["FromTrustedSource"] = $true
     }

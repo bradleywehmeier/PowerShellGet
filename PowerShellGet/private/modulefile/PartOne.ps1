@@ -105,8 +105,16 @@ else
     $script:PSGetAppLocalPath = Microsoft.PowerShell.Management\Join-Path -Path ([System.Management.Automation.Platform]::SelectProductNameForDirectory('CACHE')) -ChildPath 'PowerShellGet'
 }
 
+# TODO What is the correct parent folder???
+# EITHER:
+$script:PSGetAllUsersModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:ProgramFilesPSPath -ChildPath "PowerShellGet\PSRepositories.xml"
+# OR:
+# $script:PSGetSystemModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:PSGetProgramDataPath -ChildPath "PSRepositories.xml"
+# END TODO
+$script:PSGetAllUsersModuleSources = $null
 $script:PSGetModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:PSGetAppLocalPath -ChildPath "PSRepositories.xml"
 $script:PSGetModuleSources = $null
+$script:PSGetMergedModuleSources = $null
 $script:PSGetInstalledModules = $null
 $script:PSGetSettingsFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:PSGetAppLocalPath -ChildPath "PowerShellGetSettings.xml"
 $script:PSGetSettings = $null
@@ -147,6 +155,8 @@ $script:ProxyCredential = 'ProxyCredential'
 $script:Credential = 'Credential'
 $script:VSTSAuthenticatedFeedsDocUrl = 'https://go.microsoft.com/fwlink/?LinkID=698608'
 $script:Prerelease = "Prerelease"
+$script:PackageSourceScope = "Scope"
+$script:PackageSourceScopeValidSet = @("CurrentUser","AllUsers")
 
 $script:NuGetProviderName = "NuGet"
 $script:NuGetProviderVersion  = [Version]'2.8.5.201'

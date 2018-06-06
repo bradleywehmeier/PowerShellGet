@@ -10,11 +10,11 @@ function Get-SourceLocation
         $SourceName
     )
 
-    Set-ModuleSourcesVariable
+    $moduleSources = Get-ModuleSourcesCollection
 
-    if($script:PSGetModuleSources.Contains($SourceName))
+    if($moduleSources.Contains($SourceName))
     {
-        return $script:PSGetModuleSources[$SourceName].SourceLocation
+        return $moduleSources[$SourceName].SourceLocation
     }
     else
     {

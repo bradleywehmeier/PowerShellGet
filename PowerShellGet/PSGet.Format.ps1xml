@@ -53,6 +53,7 @@
                         <Width>20</Width>
                     </TableColumnHeader>
                     <TableColumnHeader/>
+                    <TableColumnHeader/>
                 </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
@@ -65,6 +66,9 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>SourceLocation</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Scope</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

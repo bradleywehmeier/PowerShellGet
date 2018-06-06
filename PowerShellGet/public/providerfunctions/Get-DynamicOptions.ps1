@@ -32,6 +32,7 @@ function Get-DynamicOptions
                     Write-Output -InputObject (New-DynamicOption -Category $category -Name $script:PublishLocation -ExpectedType String -IsRequired $false)
                     Write-Output -InputObject (New-DynamicOption -Category $category -Name $script:ScriptSourceLocation -ExpectedType String -IsRequired $false)
                     Write-Output -InputObject (New-DynamicOption -Category $category -Name $script:ScriptPublishLocation -ExpectedType String -IsRequired $false)
+                    Write-Output -InputObject (New-DynamicOption -Category $category -Name $script:PackageSourceScope -ExpectedType String -IsRequired $false -PermittedValues $script:PackageSourceScopeValidSet)
                 }
 
         Install

@@ -18,12 +18,19 @@ function New-PackageSourceFromModuleSource
         $ScriptPublishLocation = $ModuleSource.ScriptPublishLocation
     }
 
+    $Scope = 'CurrentUser'
+    if(Get-Member -InputObject $ModuleSource -Name $script:PackageSourceScope)
+    {
+        $Scope = $ModuleSource.Scope
+    }
+
     $packageSourceDetails = @{}
     $packageSourceDetails["InstallationPolicy"] = $ModuleSource.InstallationPolicy
     $packageSourceDetails["PackageManagementProvider"] = (Get-ProviderName -PSCustomObject $ModuleSource)
     $packageSourceDetails[$script:PublishLocation] = $ModuleSource.PublishLocation
     $packageSourceDetails[$script:ScriptSourceLocation] = $ScriptSourceLocation
     $packageSourceDetails[$script:ScriptPublishLocation] = $ScriptPublishLocation
+    $packageSourceDetails[$script:PackageSourceScope] = $Scope
 
     $ModuleSource.ProviderOptions.GetEnumerator() | Microsoft.PowerShell.Core\ForEach-Object {
                                                         $packageSourceDetails[$_.Key] = $_.Value

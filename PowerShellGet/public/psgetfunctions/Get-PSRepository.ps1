@@ -9,7 +9,12 @@ function Get-PSRepository
         [Parameter(ValueFromPipelineByPropertyName=$true)]
         [ValidateNotNullOrEmpty()]
         [string[]]
-        $Name
+        $Name,
+
+        [Parameter()]
+        [ValidateSet("CurrentUser","AllUsers")]
+        [string]
+        $Scope
     )
 
     Begin

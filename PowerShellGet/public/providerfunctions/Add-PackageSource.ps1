@@ -219,12 +219,27 @@ function Add-PackageSource
         }
     }
 
+    $Scope = 'CurrentUser'
+    if($Options.ContainsKey($script:PackageSourceScope))
+    {
+        $Scope = $Options[$script:PackageSourceScope]
+    }
+
+    if($Scope -eq "AllUsers")
+    {
+        $moduleSourcesCollection = $script:PSGetAllUsersModuleSources
+    }
+    else
+    {
+        $moduleSourcesCollection = $script:PSGetModuleSources
+    }
+
     $currentSourceObject = $null
 
     # Check if Name is already registered
-    if($script:PSGetModuleSources.Contains($Name))
+    if($moduleSourcesCollection.Contains($Name))
     {
-        $currentSourceObject = $script:PSGetModuleSources[$Name]
+        $currentSourceObject = $moduleSourcesCollection[$Name]
     }
 
     # Location is not allowed for PSGallery source
@@ -557,9 +572,9 @@ function Add-PackageSource
     }
 
     # no error so we can safely remove the source
-    if($script:PSGetModuleSources.Contains($Name))
+    if($moduleSourcesCollection.Contains($Name))
     {
-        $null = $script:PSGetModuleSources.Remove($Name)
+        $null = $moduleSourcesCollection.Remove($Name)
     }
 
     # Add new module source
@@ -573,6 +588,7 @@ function Add-PackageSource
             Registered= (-not $IsNewModuleSource)
             InstallationPolicy = if($Trusted) {'Trusted'} else {'Untrusted'}
             PackageManagementProvider = $SelectedProvider.ProviderName
+            Scope = $Scope
             ProviderOptions = $ProviderOptions
         })
 
@@ -598,10 +614,13 @@ function Add-PackageSource
     # Persist the repositories only when Register-PSRepository cmdlet is used
     if(-not $IsNewModuleSource)
     {
-        $script:PSGetModuleSources.Add($Name, $moduleSource)
+        $moduleSourcesCollection.Add($Name, $moduleSource)
 
         $message = $LocalizedData.RepositoryRegistered -f ($Name, $LocationString)
         Write-Verbose $message
+
+        # Update the merged collection
+        Set-MergedModuleSourcesVariable -Force
 
         # Persist the module sources
         Save-ModuleSources

@@ -53,7 +53,12 @@ function Set-PSRepository
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [string]
-        $PackageManagementProvider
+        $PackageManagementProvider,
+
+        [Parameter()]
+        [ValidateSet("CurrentUser","AllUsers")]
+        [string]
+        $Scope = "CurrentUser"
     )
 
     DynamicParam

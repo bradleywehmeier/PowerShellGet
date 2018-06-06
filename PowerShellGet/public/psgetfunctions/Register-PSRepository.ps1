@@ -63,7 +63,12 @@ function Register-PSRepository
         [Parameter(ParameterSetName='NameParameterSet')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $PackageManagementProvider
+        $PackageManagementProvider,
+
+        [Parameter()]
+        [ValidateSet("CurrentUser","AllUsers")]
+        [string]
+        $Scope = "CurrentUser"
     )
 
     DynamicParam

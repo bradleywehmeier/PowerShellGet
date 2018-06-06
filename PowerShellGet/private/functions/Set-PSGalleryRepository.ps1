@@ -44,12 +44,14 @@ function Set-PSGalleryRepository
                 Registered=$true
                 InstallationPolicy = if($Trusted) {'Trusted'} else {'Untrusted'}
                 PackageManagementProvider=$script:NuGetProviderName
+                Scope='CurrentUser'
                 ProviderOptions = @{}
             })
 
         $repository.PSTypeNames.Insert(0, "Microsoft.PowerShell.Commands.PSRepository")
         $script:PSGetModuleSources[$Script:PSGalleryModuleSource] = $repository
 
+        Set-MergedModuleSourcesVariable -Force
         Save-ModuleSources
 
         return $repository

@@ -7,12 +7,17 @@ function Get-SourceName
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Location
+        $Location,
+
+        [Parameter()]
+        [AllowNull()]
+        [string]
+        $Scope
     )
 
-    Set-ModuleSourcesVariable
+    $moduleSources = Get-ModuleSourcesCollection -Scope $Scope
 
-    foreach($psModuleSource in $script:PSGetModuleSources.Values)
+    foreach($psModuleSource in $moduleSources.Values)
     {
         if(($psModuleSource.Name -eq $Location) -or
            ($psModuleSource.SourceLocation -eq $Location) -or

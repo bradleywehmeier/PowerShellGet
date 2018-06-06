@@ -10,6 +10,8 @@ function Set-ModuleSourcesVariable
         $ProxyCredential
     )
 
+    $updateMerged = $false
+
     if(-not $script:PSGetModuleSources -or $Force)
     {
         $isPersistRequired = $false
@@ -57,11 +59,40 @@ function Set-ModuleSourcesVariable
 
                                                   $isPersistRequired = $true
                                               }
+
+                                              Microsoft.PowerShell.Utility\Add-Member -InputObject $script:PSGetModuleSources[$_] `
+                                                                                      -MemberType NoteProperty `
+                                                                                      -Name $script:PackageSourceScope `
+                                                                                      -Value 'CurrentUser' `
+                                                                                      -Force
                                           }
 
         if($isPersistRequired)
         {
             Save-ModuleSources
         }
+
+        $updateMerged = $true
+    }
+
+    if(-not $script:PSGetAllUsersModuleSources -or $Force)
+    {
+        if(Microsoft.PowerShell.Management\Test-Path $script:PSGetAllUsersModuleSourcesFilePath)
+        {
+            $script:PSGetAllUsersModuleSources = DeSerialize-PSObject -Path $script:PSGetAllUsersModuleSourcesFilePath
+            $script:PSGetAllUsersModuleSources.Keys | Microsoft.PowerShell.Core\ForEach-Object {
+                Microsoft.PowerShell.Utility\Add-Member -InputObject $script:PSGetAllUsersModuleSources[$_] `
+                                                        -MemberType NoteProperty `
+                                                        -Name $script:PackageSourceScope `
+                                                        -Value 'AllUsers' `
+                                                        -Force
+            }
+            $updateMerged = $true
+        }
+    }
+
+    if($updateMerged)
+    {
+        Set-MergedModuleSourcesVariable
     }
 }

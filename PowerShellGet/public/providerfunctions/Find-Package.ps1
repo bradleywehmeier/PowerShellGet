@@ -18,7 +18,7 @@ function Find-Package
 
     Write-Debug ($LocalizedData.ProviderApiDebugMessage -f ('Find-Package'))
 
-    Set-ModuleSourcesVariable
+    $moduleSources = Get-ModuleSourcesCollection -Scope $request.Options[$script:PackageSourceScope]
 
     if($RequiredVersion -and $MinimumVersion)
     {
@@ -86,9 +86,9 @@ function Find-Package
 
         foreach($sourceName in $SourceNames)
         {
-            if($script:PSGetModuleSources.Contains($sourceName))
+            if($moduleSources.Contains($sourceName))
             {
-                $ModuleSource = $script:PSGetModuleSources[$sourceName]
+                $ModuleSource = $moduleSources[$sourceName]
                 $LocationOGPHashtable[$ModuleSource.SourceLocation] = (Get-ProviderName -PSCustomObject $ModuleSource)
             }
             else
@@ -97,7 +97,7 @@ function Find-Package
 
                 if ($sourceByLocation)
                 {
-                    $ModuleSource = $script:PSGetModuleSources[$sourceByLocation]
+                    $ModuleSource = $moduleSources[$sourceByLocation]
                     $LocationOGPHashtable[$ModuleSource.SourceLocation] = (Get-ProviderName -PSCustomObject $ModuleSource)
                 }
                 else
@@ -126,7 +126,7 @@ function Find-Package
     {
         Write-Verbose $LocalizedData.NoSourceNameIsSpecified
 
-        $script:PSGetModuleSources.Values | Microsoft.PowerShell.Core\ForEach-Object { $LocationOGPHashtable[$_.SourceLocation] = (Get-ProviderName -PSCustomObject $_) }
+        $moduleSources.Values | Microsoft.PowerShell.Core\ForEach-Object { $LocationOGPHashtable[$_.SourceLocation] = (Get-ProviderName -PSCustomObject $_) }
     }
 
     $artifactTypes = $script:PSArtifactTypeModule
@@ -326,7 +326,7 @@ function Find-Package
 
                 if($SourceName)
                 {
-                    $ModuleSource = $script:PSGetModuleSources[$SourceName]
+                    $ModuleSource = $moduleSources[$SourceName]
 
                     # Skip source if no ScriptSourceLocation is available.
                     if(-not $ModuleSource.ScriptSourceLocation)
@@ -635,7 +635,7 @@ function Find-Package
 
 								if($ModuleSourceName)
 								{
-									$FromTrustedSource = $script:PSGetModuleSources[$ModuleSourceName].Trusted
+									$FromTrustedSource = $moduleSources[$ModuleSourceName].Trusted
 								}
 								elseif($InstallationPolicy -eq "Trusted")
 								{

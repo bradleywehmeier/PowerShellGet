@@ -10,7 +10,12 @@ function Unregister-PSRepository
                    Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string[]]
-        $Name
+        $Name,
+
+        [Parameter()]
+        [ValidateSet("CurrentUser","AllUsers")]
+        [string]
+        $Scope = "CurrentUser"
     )
 
     Begin

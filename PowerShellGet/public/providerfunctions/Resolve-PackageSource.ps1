@@ -11,6 +11,8 @@ function Resolve-PackageSource
         $SourceName = "*"
     }
 
+    $moduleSources = Get-ModuleSourcesCollection -Scope $request.Options[$script:PackageSourceScope]
+
     foreach($moduleSourceName in $SourceName)
     {
         if($request.IsCanceled)
@@ -21,11 +23,11 @@ function Resolve-PackageSource
         $wildcardPattern = New-Object System.Management.Automation.WildcardPattern $moduleSourceName,$script:wildcardOptions
         $moduleSourceFound = $false
 
-        $script:PSGetModuleSources.GetEnumerator() |
+        $moduleSources.GetEnumerator() |
             Microsoft.PowerShell.Core\Where-Object {$wildcardPattern.IsMatch($_.Key)} |
                 Microsoft.PowerShell.Core\ForEach-Object {
 
-                    $moduleSource = $script:PSGetModuleSources[$_.Key]
+                    $moduleSource = $moduleSources[$_.Key]
 
                     $packageSource = New-PackageSourceFromModuleSource -ModuleSource $moduleSource
 
@@ -36,11 +38,11 @@ function Resolve-PackageSource
 
         if(-not $moduleSourceFound)
         {
-            $sourceName  = Get-SourceName -Location $moduleSourceName
+            $sourceName  = Get-SourceName -Location $moduleSourceName -Scope ($request.Options[$script:PackageSourceScope])
 
             if($sourceName)
             {
-                $moduleSource = $script:PSGetModuleSources[$sourceName]
+                $moduleSource = $moduleSources[$sourceName]
 
                 $packageSource = New-PackageSourceFromModuleSource -ModuleSource $moduleSource
 

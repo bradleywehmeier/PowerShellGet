@@ -16,6 +16,7 @@ function New-ModuleSourceFromPackageSource
             PublishLocation=$PackageSource.Details[$script:PublishLocation]
             ScriptSourceLocation=$PackageSource.Details[$script:ScriptSourceLocation]
             ScriptPublishLocation=$PackageSource.Details[$script:ScriptPublishLocation]
+            Scope=$PackageSource.Details[$script:PackageSourceScope]
             ProviderOptions = @{}
         })
 
