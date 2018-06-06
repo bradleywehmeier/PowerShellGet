@@ -101,16 +101,11 @@ if($script:IsWindows)
 }
 else
 {
-    $script:PSGetProgramDataPath = Microsoft.PowerShell.Management\Join-Path -Path ([System.Management.Automation.Platform]::SelectProductNameForDirectory('CONFIG')) -ChildPath 'PowerShellGet'
+    $script:PSGetProgramDataPath = '/usr/local/share/powershellget'
     $script:PSGetAppLocalPath = Microsoft.PowerShell.Management\Join-Path -Path ([System.Management.Automation.Platform]::SelectProductNameForDirectory('CACHE')) -ChildPath 'PowerShellGet'
 }
 
-# TODO What is the correct parent folder???
-# EITHER:
-$script:PSGetAllUsersModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:ProgramFilesPSPath -ChildPath "PowerShellGet\PSRepositories.xml"
-# OR:
-# $script:PSGetSystemModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:PSGetProgramDataPath -ChildPath "PSRepositories.xml"
-# END TODO
+$script:PSGetAllUsersModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:PSGetProgramDataPath -ChildPath "PSRepositories.xml"
 $script:PSGetAllUsersModuleSources = $null
 $script:PSGetModuleSourcesFilePath = Microsoft.PowerShell.Management\Join-Path -Path $script:PSGetAppLocalPath -ChildPath "PSRepositories.xml"
 $script:PSGetModuleSources = $null
