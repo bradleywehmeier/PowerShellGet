@@ -89,6 +89,10 @@ function Set-ModuleSourcesVariable
             }
             $updateMerged = $true
         }
+        else
+        {
+            $script:PSGetAllUsersModuleSources = [ordered]@{}
+        }
     }
 
     if($updateMerged)
