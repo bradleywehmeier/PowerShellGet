@@ -62,7 +62,7 @@ function Set-ModuleSourcesVariable
 
                                               Microsoft.PowerShell.Utility\Add-Member -InputObject $script:PSGetModuleSources[$_] `
                                                                                       -MemberType NoteProperty `
-                                                                                      -Name $script:PackageSourceScope `
+                                                                                      -Name 'Scope' `
                                                                                       -Value 'CurrentUser' `
                                                                                       -Force
                                           }
@@ -83,7 +83,7 @@ function Set-ModuleSourcesVariable
             $script:PSGetAllUsersModuleSources.Keys | Microsoft.PowerShell.Core\ForEach-Object {
                 Microsoft.PowerShell.Utility\Add-Member -InputObject $script:PSGetAllUsersModuleSources[$_] `
                                                         -MemberType NoteProperty `
-                                                        -Name $script:PackageSourceScope `
+                                                        -Name 'Scope' `
                                                         -Value 'AllUsers' `
                                                         -Force
             }

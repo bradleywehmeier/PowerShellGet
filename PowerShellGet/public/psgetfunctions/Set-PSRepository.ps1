@@ -199,6 +199,12 @@ function Set-PSRepository
         $PSBoundParameters["Provider"] = $script:PSModuleProviderName
         $PSBoundParameters["MessageResolver"] = $script:PackageManagementMessageResolverScriptBlock
 
+        if($Scope)
+        {
+            $PSBoundParameters[$script:PackageSourceScope] = $Scope
+        }
+        $null = $PSBoundParameters.Remove("Scope")
+
         $null = PackageManagement\Set-PackageSource @PSBoundParameters
     }
 }

@@ -18,10 +18,13 @@ function New-PackageSourceFromModuleSource
         $ScriptPublishLocation = $ModuleSource.ScriptPublishLocation
     }
 
-    $Scope = 'CurrentUser'
-    if(Get-Member -InputObject $ModuleSource -Name $script:PackageSourceScope)
+    if($ModuleSource.Scope)
     {
         $Scope = $ModuleSource.Scope
+    }
+    else
+    {
+        $Scope = 'CurrentUser'
     }
 
     $packageSourceDetails = @{}

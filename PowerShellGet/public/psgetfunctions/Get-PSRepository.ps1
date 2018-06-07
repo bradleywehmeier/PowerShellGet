@@ -27,6 +27,12 @@ function Get-PSRepository
         $PSBoundParameters["Provider"] = $script:PSModuleProviderName
         $PSBoundParameters["MessageResolver"] = $script:PackageManagementMessageResolverScriptBlock
 
+        if($Scope)
+        {
+            $PSBoundParameters[$script:PackageSourceScope] = $Scope
+        }
+        $null = $PSBoundParameters.Remove("Scope")
+
         if($Name)
         {
             foreach($sourceName in $Name)

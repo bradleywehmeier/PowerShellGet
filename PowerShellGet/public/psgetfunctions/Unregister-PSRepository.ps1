@@ -30,6 +30,12 @@ function Unregister-PSRepository
 
         $null = $PSBoundParameters.Remove("Name")
 
+        if($Scope)
+        {
+            $PSBoundParameters[$script:PackageSourceScope] = $Scope
+        }
+        $null = $PSBoundParameters.Remove("Scope")
+
         foreach ($moduleSourceName in $Name)
         {
             # Check if $moduleSourceName contains any wildcards

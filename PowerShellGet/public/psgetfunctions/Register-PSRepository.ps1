@@ -206,6 +206,12 @@ function Register-PSRepository
         }
         $null = $PSBoundParameters.Remove("InstallationPolicy")
 
+        if($Scope)
+        {
+            $PSBoundParameters[$script:PackageSourceScope] = $Scope
+        }
+        $null = $PSBoundParameters.Remove("Scope")
+
         $PSBoundParameters["Provider"] = $script:PSModuleProviderName
         $PSBoundParameters["MessageResolver"] = $script:PackageManagementMessageResolverScriptBlock
 

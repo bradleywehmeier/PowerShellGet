@@ -150,7 +150,7 @@ $script:ProxyCredential = 'ProxyCredential'
 $script:Credential = 'Credential'
 $script:VSTSAuthenticatedFeedsDocUrl = 'https://go.microsoft.com/fwlink/?LinkID=698608'
 $script:Prerelease = "Prerelease"
-$script:PackageSourceScope = "Scope"
+$script:PackageSourceScope = "PackageSourceScope"
 $script:PackageSourceScopeValidSet = @("CurrentUser","AllUsers")
 
 $script:NuGetProviderName = "NuGet"
