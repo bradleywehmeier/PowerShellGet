@@ -121,6 +121,43 @@ Describe PowerShell.PSGet.PackageManagementIntegrationTests -Tags 'P1','OuterLoo
     }
 
     <#
+    Purpose: Validate the Register-PackageSource, Get-PackageSource and Unregister-PackageSource functionality with PowerShellGet provider and PackageSourceScope
+
+    Action: Register a module source in the AllUsers scope and Get the registered module source details, verify the scope, then unregister it.
+
+    Expected Result: should be able to register, get the module source (optinally filtered by scope), and unregister it.
+    #>
+    It ValidateRegisterPackageSourceWithPSModuleProviderWithAllUsersScope {
+
+        $Location='https://www.nuget.org/api/v2/'
+        $beforePackageSourcesCount = (Get-PackageSource -Provider $script:PSGetModuleProviderName | Measure-Object).Count
+
+        Register-PackageSource -Name $script:TestModuleSourceName -PackageSourceScope "AllUsers" -Location $Location -Provider $script:PSGetModuleProviderName -PackageManagementProvider "NuGet"
+
+        $afterPackageSourcesCount = (Get-PackageSource -Provider $script:PSGetModuleProviderName | Measure-Object).Count
+        AssertEquals ($beforePackageSourcesCount + 1) $afterPackageSourcesCount "PackageSources count should be 1 more after registering the package source with PowerShellGet provider"
+
+        $packageSource = Get-PackageSource -Name $script:TestModuleSourceName -Provider $script:PSGetModuleProviderName
+        AssertNotNull $packageSource "The module source was registered with -PackageSourceScope AllUsers but is not listed when calling Get-PackageSource"
+
+        AssertFullyQualifiedErrorIdEquals `
+            -scriptblock { Get-PackageSource -Name $script:TestModuleSourceName -PackageSourceScope CurrentUser -Provider $script:PSGetModuleProviderName } `
+            -expectedFullyQualifiedErrorId 'SourceNotFound,Microsoft.PowerShell.PackageManagement.Cmdlets.GetPackageSource'
+
+        $packageSource = Get-PackageSource -Name $script:TestModuleSourceName -PackageSourceScope AllUsers -Provider $script:PSGetModuleProviderName
+        AssertNotNull $packageSource "The module source was registered with -PackageSourceScope AllUsers but is not listed when calling Get-PackageSource -PackageSourceScope AllUsers"
+
+        AssertEquals $packageSource.Name $script:TestModuleSourceName "The package source name is not same as the registered name"
+        AssertEquals $packageSource.Location $Location "The package source location is not same as the registered location"
+        AssertEquals $packageSource.Details.PackageSourceScope "AllUsers" "The package source scope is not same as specified in the registration"
+
+        Unregister-PackageSource -Name $script:TestModuleSourceName -PackageSourceScope AllUsers
+
+        $afterPackageSourcesCount = (Get-PackageSource -Provider $script:PSGetModuleProviderName | Measure-Object).Count
+        AssertEquals $beforePackageSourcesCount $afterPackageSourcesCount "PackageSources count should be same after unregistering the package source with PowerShellGet provider"
+    }
+
+    <#
     Purpose: Validate the Register-PackageSource functionality with PowerShellGet provider and PackageManagementProvider which doesnt support modules
 
     Action: Register a module source with PackageManagementProvider name which doesn't support the modules.
@@ -167,6 +204,64 @@ Describe PowerShell.PSGet.PackageManagementIntegrationTests -Tags 'P1','OuterLoo
         $afterSources = Get-PSRepository
 
         AssertEquals $beforeSources.Count $afterSources.Count "Module Sources count should be same after unregistering the module source"
+    }
+
+    <#
+    Purpose: Validate the Register-PSRepository, Get-PSRepository, Set-PSRepository and Unregister-PSRepository functionality with Scope
+
+    Action: Register a module source in the AllUsers scope and Get the registered module source details, verify the scope, then unregister it.
+
+    Expected Result: should be able to register, get the module source (optinally filtered by scope), and unregister it.
+    #>
+    It ValidateModuleSourceCmdletsWithAllUsersScope {
+
+        $Location='https://www.nuget.org/api/v2/'
+
+        $beforeCount = (Get-PSRepository | Measure-Object).Count
+
+        Register-PSRepository -Name $script:TestModuleSourceName -Scope AllUsers -SourceLocation $Location -InstallationPolicy Trusted
+
+        $afterCount = (Get-PSRepository | Measure-Object).Count
+        AssertEquals ($beforeCount + 1) $afterCount "Module Sources count should be 1 more after registering the module source"
+
+        $source = Get-PSRepository -Name $script:TestModuleSourceName
+        AssertNotNull $source "The module source was registered with -Scope AllUsers but is not listed when calling Get-PSRepository"
+
+        AssertFullyQualifiedErrorIdEquals `
+            -scriptblock { Get-PSRepository -Name $script:TestModuleSourceName -Scope CurrentUser } `
+            -expectedFullyQualifiedErrorId 'SourceNotFound,Microsoft.PowerShell.PackageManagement.Cmdlets.GetPackageSource'
+
+        $source = Get-PSRepository -Name $script:TestModuleSourceName -Scope AllUsers
+        AssertNotNull $source "The module source was registered with -Scope AllUsers but is not listed when calling Get-PSRepository -Scope AllUsers"
+
+        AssertEquals $source.Name $script:TestModuleSourceName "The module source name is not same as the registered name"
+        AssertEquals $source.SourceLocation $Location "The module source location is not same as the registered location"
+        AssertEquals $source.Trusted $true "The module source IsTrusted is not same as specified in the registration"
+        AssertEquals $source.InstallationPolicy "Trusted" "The module source IsTrusted is not same as specified in the registration"
+        AssertEquals $source.Scope "AllUsers" "The module source Scope is not same as specified in the registration"
+
+        # Omitted Scope parameter defaults to CurrentUser
+        AssertFullyQualifiedErrorIdEquals `
+            -scriptblock { Set-PSRepository -Name $script:TestModuleSourceName -InstallationPolicy Untrusted } `
+            -expectedFullyQualifiedErrorId "SourceNotFound,Microsoft.PowerShell.PackageManagement.Cmdlets.SetPackageSource"
+        # Test with scope specified as CurrentUser
+        AssertFullyQualifiedErrorIdEquals `
+            -scriptblock { Set-PSRepository -Name $script:TestModuleSourceName -Scope CurrentUser -InstallationPolicy Untrusted } `
+            -expectedFullyQualifiedErrorId "SourceNotFound,Microsoft.PowerShell.PackageManagement.Cmdlets.SetPackageSource"
+
+        Set-PSRepository -Name $script:TestModuleSourceName -Scope AllUsers -InstallationPolicy Untrusted
+        $source = Get-PSRepository -Name $script:TestModuleSourceName
+
+        AssertEquals $source.Name $script:TestModuleSourceName "The module source name is not same as the registered name"
+        AssertEquals $source.SourceLocation $Location "The module source location is not same as the registered location"
+        AssertEquals $source.Trusted $false "The module source IsTrusted is not same as specified in the registration"
+        AssertEquals $source.InstallationPolicy "Untrusted" "The module source IsTrusted is not same as specified in the registration"
+        AssertEquals $source.Scope "AllUsers" "The module source Scope is not same as specified in the registration"
+
+        $source | Unregister-PSRepository
+
+        $afterCount = (Get-PSRepository | Measure-Object).Count
+        AssertEquals $beforeCount $afterCount "Module Sources count should be same after unregistering the module source"
     }
 
     <#
