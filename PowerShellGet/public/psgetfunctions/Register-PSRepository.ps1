@@ -65,7 +65,7 @@ function Register-PSRepository
         [string]
         $PackageManagementProvider,
 
-        [Parameter()]
+        [Parameter(ParameterSetName='NameParameterSet')]
         [ValidateSet("CurrentUser","AllUsers")]
         [string]
         $Scope = "CurrentUser"
