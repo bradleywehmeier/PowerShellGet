@@ -1,5 +1,6 @@
 function Remove-PackageSource
 {
+    [CmdletBinding()]
     param
     (
         [string]
@@ -10,7 +11,8 @@ function Remove-PackageSource
 
     Set-ModuleSourcesVariable -Force
 
-    if($request.Options.ContainsKey($script:PackageSourceScope) -and $request.Options[$script:PackageSourceScope] -eq 'AllUsers')
+    $scope = $request.Options[$script:PackageSourceScope]
+    if($scope -eq 'AllUsers')
     {
         $moduleSourcesCollection = $script:PSGetAllUsersModuleSources
     }
@@ -47,6 +49,16 @@ function Remove-PackageSource
         $ModuleSourcesToBeRemoved += $moduleSourceName
         $message = $LocalizedData.RepositoryUnregistered -f ($moduleSourceName)
         Write-Verbose $message
+    }
+
+    if($scope -eq 'AllUsers' -and -not (Test-RunningAsElevated))
+    {
+        # Throw an error when Unregister-PSRepository is used as a non-admin user and '-Scope AllUsers' is specified
+        ThrowError -ExceptionName "System.ArgumentException" `
+                   -ExceptionMessage ($LocalizedData.UnregisterRepositoryNeedsAdminUserForAllUsersScope -f ($ModuleSourcesToBeRemoved -Join ',')) `
+                   -ErrorId 'UnregisterRepositoryNeedsAdminUserForAllUsersScope' `
+                   -CallerPSCmdlet $PSCmdlet `
+                   -ErrorCategory InvalidArgument
     }
 
     # Remove the module source

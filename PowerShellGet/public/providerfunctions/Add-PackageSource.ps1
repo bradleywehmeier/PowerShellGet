@@ -242,6 +242,26 @@ function Add-PackageSource
         $currentSourceObject = $moduleSourcesCollection[$Name]
     }
 
+    if($Scope -eq "AllUsers" -and -not (Test-RunningAsElevated))
+    {
+        if($currentSourceObject)
+        {
+            $needsAdminMessage = $LocalizedData.SetRepositoryNeedsAdminUserForAllUsersScope -f $Name
+            $needsAdminErrorId = 'SetRepositoryNeedsAdminUserForAllUsersScope'
+        }
+        else
+        {
+            $needsAdminMessage = $LocalizedData.RegisterRepositoryNeedsAdminUserForAllUsersScope -f $Name
+            $needsAdminErrorId = 'RegisterRepositoryNeedsAdminUserForAllUsersScope'
+        }
+        # Throw an error when Register/Set-PSRepository is used as a non-admin user and '-Scope AllUsers' is specified
+        ThrowError -ExceptionName "System.ArgumentException" `
+                    -ExceptionMessage $needsAdminMessage `
+                    -ErrorId $needsAdminErrorId `
+                    -CallerPSCmdlet $PSCmdlet `
+                    -ErrorCategory InvalidArgument
+    }
+
     # Location is not allowed for PSGallery source
     # However OneGet passes Location value during Set-PackageSource cmdlet,
     # that's why ensuring that Location value is same as the current SourceLocation
