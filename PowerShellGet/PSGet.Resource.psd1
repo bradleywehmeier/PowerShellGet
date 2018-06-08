@@ -255,6 +255,9 @@ ConvertFrom-StringData @'
         FailedToParseRequiredScripts=Cannot parse REQUIREDSCRIPTS '{0}'. Acceptable formats are: '{1}'.
         FailedToParseRequiredScriptsVersion=Version format error: {0}, '{1}'. Acceptable formats are: '{2}'. 
         PublishersMismatchAsWarning=Module '{0}' version '{1}' published by '{2}' will be superceded by version '{3}' published by '{4}'. If you do not trust the new publisher, uninstall the module.
+        RegisterRepositoryNeedsAdminUserForAllUsersScope=Administrator rights are required to register the specified repository '{0}' for AllUsers. Log on to the computer with an account that has Administrator rights, and then try again, or register the repository without "-Scope AllUsers". You can also try running the Windows PowerShell session with elevated rights (Run as Administrator).
+        SetRepositoryNeedsAdminUserForAllUsersScope=Administrator rights are required to modify the specified repository '{0}' for AllUsers. Log on to the computer with an account that has Administrator rights, and then try again. You can also try running the Windows PowerShell session with elevated rights (Run as Administrator).
+        UnregisterRepositoryNeedsAdminUserForAllUsersScope=Administrator rights are required to unregister the specified repository '{0}' for AllUsers. Log on to the computer with an account that has Administrator rights, and then try again. You can also try running the Windows PowerShell session with elevated rights (Run as Administrator).
 ###PSLOC
 '@
 
