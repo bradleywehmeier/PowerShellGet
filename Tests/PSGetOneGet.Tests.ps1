@@ -62,7 +62,8 @@ Describe PowerShell.PSGet.PackageManagementIntegrationTests -Tags 'P1','OuterLoo
     }
 
     AfterEach {
-        Get-PSRepository -Name $script:TestModuleSourceName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Unregister-PSRepository
+        Get-PSRepository -Name $script:TestModuleSourceName -Scope CurrentUser -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Unregister-PSRepository
+        Get-PSRepository -Name $script:TestModuleSourceName -Scope AllUsers -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Unregister-PSRepository
         PSGetTestUtils\Uninstall-Module ContosoServer
         PSGetTestUtils\Uninstall-Module ContosoClient
     }
