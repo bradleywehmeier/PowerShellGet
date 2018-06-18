@@ -58,7 +58,7 @@ function Set-PSRepository
         [Parameter()]
         [ValidateSet("CurrentUser","AllUsers")]
         [string]
-        $Scope = "CurrentUser"
+        $Scope
     )
 
     DynamicParam

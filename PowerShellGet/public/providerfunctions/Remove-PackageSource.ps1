@@ -11,15 +11,7 @@ function Remove-PackageSource
 
     Set-ModuleSourcesVariable -Force
 
-    $scope = $request.Options[$script:PackageSourceScope]
-    if($scope -eq 'AllUsers')
-    {
-        $moduleSourcesCollection = $script:PSGetAllUsersModuleSources
-    }
-    else
-    {
-        $moduleSourcesCollection = $script:PSGetModuleSources
-    }
+    $moduleSourcesCollection = Get-ModuleSourcesCollection -Scope $request.Options[$script:PackageSourceScope]
 
     $ModuleSourcesToBeRemoved = @()
 
@@ -46,23 +38,34 @@ function Remove-PackageSource
             continue
         }
 
-        $ModuleSourcesToBeRemoved += $moduleSourceName
+        $moduleSource = $moduleSourcesCollection[$moduleSourceName]
+
+        if($moduleSource.Scope -eq 'AllUsers' -and -not (Test-RunningAsElevated))
+        {
+            # Throw an error when Unregister-PSRepository is used as a non-admin user and '-Scope AllUsers' is specified
+            ThrowError -ExceptionName "System.ArgumentException" `
+                    -ExceptionMessage ($LocalizedData.UnregisterRepositoryNeedsAdminUserForAllUsersScope -f ($ModuleSourcesToBeRemoved -Join ',')) `
+                    -ErrorId 'UnregisterRepositoryNeedsAdminUserForAllUsersScope' `
+                    -CallerPSCmdlet $PSCmdlet `
+                    -ErrorCategory InvalidArgument
+        }
+
+        $ModuleSourcesToBeRemoved += $moduleSource
         $message = $LocalizedData.RepositoryUnregistered -f ($moduleSourceName)
         Write-Verbose $message
     }
 
-    if($scope -eq 'AllUsers' -and -not (Test-RunningAsElevated))
-    {
-        # Throw an error when Unregister-PSRepository is used as a non-admin user and '-Scope AllUsers' is specified
-        ThrowError -ExceptionName "System.ArgumentException" `
-                   -ExceptionMessage ($LocalizedData.UnregisterRepositoryNeedsAdminUserForAllUsersScope -f ($ModuleSourcesToBeRemoved -Join ',')) `
-                   -ErrorId 'UnregisterRepositoryNeedsAdminUserForAllUsersScope' `
-                   -CallerPSCmdlet $PSCmdlet `
-                   -ErrorCategory InvalidArgument
-    }
-
     # Remove the module source
-    $ModuleSourcesToBeRemoved | Microsoft.PowerShell.Core\ForEach-Object { $null = $moduleSourcesCollection.Remove($_) }
+    $ModuleSourcesToBeRemoved | Microsoft.PowerShell.Core\ForEach-Object {
+        if($_.Scope -eq 'AllUsers')
+        {
+            $null = $script:PSGetAllUsersModuleSources.Remove($_.Name)
+        }
+        else
+        {
+            $null = $script:PSGetModuleSources.Remove($_.Name)
+        }
+    }
 
     # Update the merged collection
     Set-MergedModuleSourcesVariable -Force

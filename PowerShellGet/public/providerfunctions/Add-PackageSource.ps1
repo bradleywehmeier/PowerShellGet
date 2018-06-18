@@ -219,10 +219,22 @@ function Add-PackageSource
         }
     }
 
-    $Scope = 'CurrentUser'
-    if($Options.ContainsKey($script:PackageSourceScope))
+    $currentSourceObject = $null
+
+    # Check if Name is already registered
+    $moduleSources = Get-ModuleSourcesCollection -Scope $request.Options[$script:PackageSourceScope]
+    if($moduleSources.Contains($Name))
+    {
+        $currentSourceObject = $moduleSources[$Name]
+        $Scope = $currentSourceObject.Scope
+    }
+    elseif ($Options.ContainsKey($script:PackageSourceScope))
     {
         $Scope = $Options[$script:PackageSourceScope]
+    }
+    else
+    {
+        $Scope = 'CurrentUser'
     }
 
     if($Scope -eq "AllUsers")
@@ -232,14 +244,6 @@ function Add-PackageSource
     else
     {
         $moduleSourcesCollection = $script:PSGetModuleSources
-    }
-
-    $currentSourceObject = $null
-
-    # Check if Name is already registered
-    if($moduleSourcesCollection.Contains($Name))
-    {
-        $currentSourceObject = $moduleSourcesCollection[$Name]
     }
 
     if($Scope -eq "AllUsers" -and -not (Test-RunningAsElevated))

@@ -15,7 +15,7 @@ function Unregister-PSRepository
         [Parameter(ValueFromPipelineByPropertyName=$true)]
         [ValidateSet("CurrentUser","AllUsers")]
         [string]
-        $Scope = "CurrentUser"
+        $Scope
     )
 
     Begin
